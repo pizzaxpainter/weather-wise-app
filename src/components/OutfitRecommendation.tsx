@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OutfitRecommendation as OutfitRecommendationType } from '@/utils/outfitRecommender';
-import { Shirt, Pants, Shoe, StarIcon } from 'lucide-react';
+import { Shirt, ShoppingBag, Boot, Star } from 'lucide-react';
 
 interface OutfitRecommendationProps {
   recommendation: OutfitRecommendationType | null;
@@ -36,13 +36,13 @@ const OutfitRecommendation: React.FC<OutfitRecommendationProps> = ({ recommendat
             </div>
             
             <div className="flex items-center gap-2">
-              <Pants className="w-5 h-5 opacity-70" />
+              <ShoppingBag className="w-5 h-5 opacity-70" />
               <span className="font-medium">Bottom:</span>
               <span>{recommendation.bottomWear}</span>
             </div>
             
             <div className="flex items-center gap-2">
-              <Shoe className="w-5 h-5 opacity-70" />
+              <Boot className="w-5 h-5 opacity-70" />
               <span className="font-medium">Footwear:</span>
               <span>{recommendation.footwear}</span>
             </div>
@@ -62,7 +62,7 @@ const OutfitRecommendation: React.FC<OutfitRecommendationProps> = ({ recommendat
             
             {recommendation.advice && (
               <div className="flex items-start gap-2 mt-3 bg-white/10 p-2 rounded">
-                <StarIcon className="w-5 h-5 text-yellow-300 mt-0.5" />
+                <Star className="w-5 h-5 text-yellow-300 mt-0.5" />
                 <p className="text-sm">{recommendation.advice}</p>
               </div>
             )}
