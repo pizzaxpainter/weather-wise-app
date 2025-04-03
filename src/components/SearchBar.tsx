@@ -27,11 +27,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="bg-white/20 text-white placeholder:text-white/70 border-white/20"
+        required
+        aria-label="City name"
       />
       <Button 
         type="submit" 
         variant="secondary"
-        disabled={isLoading}
+        disabled={isLoading || !query.trim()}
       >
         <Search className="h-4 w-4 mr-2" />
         {isLoading ? 'Searching...' : 'Search'}

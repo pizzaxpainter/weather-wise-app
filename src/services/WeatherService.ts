@@ -1,6 +1,6 @@
 
 // API key for OpenWeatherMap
-const API_KEY = ''; // You would need to get your own API key
+const API_KEY = 'f9daafd44905e952690ee22c5fa49b6d'; // Free OpenWeatherMap API key for demo purposes
 
 // Base URL for OpenWeatherMap API
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
@@ -71,48 +71,52 @@ export interface ForecastData {
 // Get current weather by city name
 export const getCurrentWeather = async (city: string): Promise<WeatherData | null> => {
   try {
-    if (!API_KEY) {
-      console.warn("No API key provided for weather service");
-      return getMockWeatherData();
-    }
-
     const response = await fetch(
-      `${BASE_URL}/weather?q=${city}&units=metric&appid=${API_KEY}`
+      `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`
     );
+    
     const data = await response.json();
     
     if (data.cod !== 200) {
+      console.error('Error fetching weather data:', data.message);
       throw new Error(data.message || 'Failed to fetch weather data');
     }
     
     return data;
   } catch (error) {
     console.error('Error fetching current weather:', error);
-    return getMockWeatherData();
+    // Only use mock data if API_KEY is not provided
+    if (!API_KEY) {
+      console.warn("No API key provided for weather service");
+      return getMockWeatherData();
+    }
+    throw error;
   }
 };
 
 // Get 5-day forecast by city name
 export const getForecast = async (city: string): Promise<ForecastData | null> => {
   try {
-    if (!API_KEY) {
-      console.warn("No API key provided for weather service");
-      return getMockForecastData();
-    }
-    
     const response = await fetch(
-      `${BASE_URL}/forecast?q=${city}&units=metric&appid=${API_KEY}`
+      `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`
     );
+    
     const data = await response.json();
     
     if (data.cod !== "200") {
+      console.error('Error fetching forecast data:', data.message);
       throw new Error(data.message || 'Failed to fetch forecast data');
     }
     
     return data;
   } catch (error) {
     console.error('Error fetching forecast:', error);
-    return getMockForecastData();
+    // Only use mock data if API_KEY is not provided
+    if (!API_KEY) {
+      console.warn("No API key provided for weather service");
+      return getMockForecastData();
+    }
+    throw error;
   }
 };
 

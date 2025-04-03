@@ -35,16 +35,21 @@ const WeatherApp: React.FC = () => {
         // Set background based on weather condition and time
         const isDay = weather.dt > weather.sys.sunrise && weather.dt < weather.sys.sunset;
         setBackgroundClass(getBackgroundClass(weather.weather[0].main, isDay));
+        
+        toast({
+          title: "Updated",
+          description: `Weather data for ${weather.name} has been updated.`,
+        });
       }
       
       if (forecast) {
         setForecastData(forecast);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching weather data:', error);
       toast({
         title: "Error",
-        description: "Unable to fetch weather data. Please try again.",
+        description: error.message || "Unable to fetch weather data. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -78,14 +83,20 @@ const WeatherApp: React.FC = () => {
           const response = await fetch(
             `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
           );
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch location data');
+          }
+          
           const data = await response.json();
+          console.log("Geocoding response:", data);
           
           // Extract city name
           const detectedCity = data.city || data.locality || data.principalSubdivision;
           
           if (detectedCity) {
             setCity(detectedCity);
-            fetchWeatherData();
+            await fetchWeatherData();
             toast({
               title: "Location detected",
               description: `Weather for ${detectedCity}`,
@@ -104,8 +115,9 @@ const WeatherApp: React.FC = () => {
             description: "Failed to detect your location. Please try again.",
             variant: "destructive"
           });
+        } finally {
+          setGeolocating(false);
         }
-        setGeolocating(false);
       },
       (error) => {
         console.error('Geolocation error:', error);
@@ -116,7 +128,7 @@ const WeatherApp: React.FC = () => {
         });
         setGeolocating(false);
       },
-      { timeout: 10000 }
+      { timeout: 15000, enableHighAccuracy: true }
     );
   };
 
