@@ -4,7 +4,7 @@
 
 Weather Wise is a weather app with a little magic. It tells you what you must wear according to the current weather! This saves a lot of time when you're rushing out and need to choose an outfit quickly. 
 
-## App URL 
+## Access it here!
 
 https://pizzaxpainter.github.io/weather-wise-app/
 
