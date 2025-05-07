@@ -1,11 +1,6 @@
-
-// API key for OpenWeatherMap
-const API_KEY = '3b53a0ce6bb5c2f8157cd4e3c819b81e'; // Valid OpenWeatherMap API key
-
-// Base URL for OpenWeatherMap API
+const API_KEY = '81f72b66aa3fa7fb237f495849d61683';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
-// Interface for weather data
 export interface WeatherData {
   main: {
     temp: number;
@@ -26,20 +21,15 @@ export interface WeatherData {
     deg: number;
   };
   name: string;
-  dt: number;
   sys: {
     country: string;
-    sunrise: number;
-    sunset: number;
   };
   cod: number;
   message?: string;
 }
 
-// Interface for forecast data
 export interface ForecastData {
   list: Array<{
-    dt: number;
     main: {
       temp: number;
       feels_like: number;
@@ -58,7 +48,6 @@ export interface ForecastData {
       speed: number;
       deg: number;
     };
-    dt_txt: string;
   }>;
   city: {
     name: string;
@@ -68,128 +57,174 @@ export interface ForecastData {
   message?: string;
 }
 
-// Get current weather by city name
+export const getCityInfo = (city: string): { countryCode: string } => {
+  const cityMapping: { [key: string]: { countryCode: string } } = {
+    'Singapore': { countryCode: 'SG' },
+    'New York': { countryCode: 'US' },
+    'London': { countryCode: 'GB' },
+    'Tokyo': { countryCode: 'JP' },
+    'Paris': { countryCode: 'FR' },
+    'Sydney': { countryCode: 'AU' },
+    'Berlin': { countryCode: 'DE' },
+    'Moscow': { countryCode: 'RU' },
+    'Beijing': { countryCode: 'CN' },
+    'Dubai': { countryCode: 'AE' },
+    'Delhi': { countryCode: 'IN' },
+    'Jakarta': { countryCode: 'ID' },
+    'Bangkok': { countryCode: 'TH' },
+    'Hanoi': { countryCode: 'VN' },
+    'Manila': { countryCode: 'PH' },
+    'Kuala Lumpur': { countryCode: 'MY' },
+    'Ho Chi Minh City': { countryCode: 'VN' },    
+  };
+
+  return cityMapping[city] || { countryCode: 'SG' };
+};
+
+const getCityTemperatureRange = (city: string): { avg: number; min: number; max: number } => {
+  const tempMapping: { [key: string]: { avg: number; min: number; max: number } } = {
+    'Singapore': { avg: 32, min: 28, max: 34 },
+    'New York': { avg: 22, min: 18, max: 26 },
+    'London': { avg: 18, min: 14, max: 22 },
+    'Tokyo': { avg: 25, min: 21, max: 28 },
+    'Paris': { avg: 20, min: 16, max: 24 },
+    'Sydney': { avg: 26, min: 22, max: 30 },
+    'Berlin': { avg: 19, min: 15, max: 23 },
+    'Moscow': { avg: 15, min: 10, max: 20 },
+    'Beijing': { avg: 27, min: 23, max: 31 },
+    'Dubai': { avg: 36, min: 32, max: 40 },
+  };
+
+  return tempMapping[city] || { avg: 22, min: 18, max: 26 };
+};
+
 export const getCurrentWeather = async (city: string): Promise<WeatherData | null> => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`
-    );
-    
+    const response = await fetch(`${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`);
     const data = await response.json();
-    
     if (data.cod !== 200) {
       console.error('Error fetching weather data:', data.message);
-      // If API returns an error, use mock data instead of throwing
-      console.log('Using mock weather data due to API error');
       return getMockWeatherData(city);
     }
-    
     return data;
   } catch (error) {
-    console.error('Error fetching current weather:', error);
-    // Use mock data for any errors
-    console.log('Using mock weather data due to fetch error');
+    console.error('Fetch error:', error);
     return getMockWeatherData(city);
   }
 };
 
-// Get 5-day forecast by city name
 export const getForecast = async (city: string): Promise<ForecastData | null> => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`
-    );
-    
+    const response = await fetch(`${BASE_URL}/forecast?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`);
     const data = await response.json();
-    
     if (data.cod !== "200") {
-      console.error('Error fetching forecast data:', data.message);
-      // If API returns an error, use mock data instead of throwing
-      console.log('Using mock forecast data due to API error');
+      console.error('Error fetching forecast:', data.message);
       return getMockForecastData(city);
     }
-    
     return data;
   } catch (error) {
-    console.error('Error fetching forecast:', error);
-    // Use mock data for any errors
-    console.log('Using mock forecast data due to fetch error');
+    console.error('Fetch error:', error);
     return getMockForecastData(city);
   }
 };
 
-// Mock data for development without an API key
-const getMockWeatherData = (city: string = "New York"): WeatherData => {
+export const getWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData | null> => {
+  try {
+    const response = await fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
+    const data = await response.json();
+    if (data.cod !== 200) {
+      console.error('Error fetching coordinates weather:', data.message);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return null;
+  }
+};
+
+export const getForecastByCoords = async (lat: number, lon: number): Promise<ForecastData | null> => {
+  try {
+    const response = await fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
+    const data = await response.json();
+    if (data.cod !== "200") {
+      console.error('Error fetching coordinates forecast:', data.message);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return null;
+  }
+};
+
+const getMockWeatherData = (city: string): WeatherData => {
+  const { countryCode } = getCityInfo(city);
+  const tempRange = getCityTemperatureRange(city);
+
   return {
     main: {
-      temp: 22.5,
-      feels_like: 23.2,
-      temp_min: 21.0,
-      temp_max: 24.8,
+      temp: tempRange.avg,
+      feels_like: tempRange.avg + (Math.random() * 2 - 1),
+      temp_min: tempRange.min,
+      temp_max: tempRange.max,
       humidity: 65,
       pressure: 1012
     },
-    weather: [
-      {
-        id: 800,
-        main: "Clear",
-        description: "clear sky",
-        icon: "01d"
-      }
-    ],
+    weather: [{
+      id: 800,
+      main: "Clear",
+      description: "clear sky",
+      icon: "01d"
+    }],
     wind: {
       speed: 3.6,
       deg: 220
     },
     name: city,
-    dt: Date.now() / 1000,
     sys: {
-      country: "US",
-      sunrise: Date.now() / 1000 - 3600,
-      sunset: Date.now() / 1000 + 3600
+      country: countryCode
     },
     cod: 200
   };
 };
 
-// Mock forecast data
-const getMockForecastData = (city: string = "New York"): ForecastData => {
+const getMockForecastData = (city: string): ForecastData => {
   const list = [];
-  const now = Date.now();
-  
-  // Create 5 days forecast with 3-hour intervals
+  const { countryCode } = getCityInfo(city);
+  const tempRange = getCityTemperatureRange(city);
+
   for (let i = 0; i < 40; i++) {
+    const dayNumber = Math.floor(i / 8);
+    const isRainy = city === 'Singapore' ? (dayNumber === 0 || dayNumber === 2) : (i % 5 === 0);
+
     list.push({
-      dt: now / 1000 + i * 3 * 3600,
       main: {
-        temp: 20 + Math.random() * 10,
-        feels_like: 21 + Math.random() * 10,
-        temp_min: 19 + Math.random() * 5,
-        temp_max: 24 + Math.random() * 5,
+        temp: tempRange.min + Math.random() * (tempRange.max - tempRange.min),
+        feels_like: tempRange.min + Math.random() * (tempRange.max - tempRange.min) + 1,
+        temp_min: tempRange.min - Math.random() * 2,
+        temp_max: tempRange.max + Math.random() * 2,
         humidity: 60 + Math.random() * 20,
         pressure: 1010 + Math.random() * 10
       },
-      weather: [
-        {
-          id: i % 5 === 0 ? 500 : 800,
-          main: i % 5 === 0 ? "Rain" : "Clear",
-          description: i % 5 === 0 ? "light rain" : "clear sky",
-          icon: i % 5 === 0 ? "10d" : "01d"
-        }
-      ],
+      weather: [{
+        id: isRainy ? 500 : 800,
+        main: isRainy ? "Rain" : "Clear",
+        description: isRainy ? "light rain" : "clear sky",
+        icon: isRainy ? "10d" : "01d"
+      }],
       wind: {
         speed: 3 + Math.random() * 5,
         deg: Math.random() * 360
-      },
-      dt_txt: new Date(now + i * 3 * 3600 * 1000).toISOString()
+      }
     });
   }
-  
+
   return {
     list,
     city: {
       name: city,
-      country: "US"
+      country: countryCode
     },
     cod: 200
   };
