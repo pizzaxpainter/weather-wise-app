@@ -128,22 +128,30 @@ export const getBackgroundClass = (condition: string, isDay: boolean): string =>
   const lowercaseCondition = condition.toLowerCase();
   
   if (lowercaseCondition.includes('thunderstorm')) {
-    return 'bg-gradient-to-b from-thunderstorm to-gray-900';
+    // Deep purple to dark gray
+    return 'bg-gradient-to-b from-purple-800 via-gray-800 to-gray-900';
   } else if (lowercaseCondition.includes('rain') || lowercaseCondition.includes('drizzle')) {
-    return 'bg-gradient-to-b from-rain to-gray-800';
+    // Strong blue-gray to slate
+    return 'bg-gradient-to-b from-blue-800 via-blue-700 to-slate-900';
   } else if (lowercaseCondition.includes('snow')) {
-    return 'bg-gradient-to-b from-snow to-blue-100';
+    // Blue-gray to indigo, not white!
+    return 'bg-gradient-to-b from-blue-300 via-indigo-500 to-indigo-800';
   } else if (lowercaseCondition.includes('clear')) {
-    return isDay 
-      ? 'bg-gradient-to-b from-day-clear to-blue-300' 
-      : 'bg-gradient-to-b from-night-clear to-blue-900';
+    return isDay
+      // Vivid blue to sky, not pale!
+      ? 'bg-gradient-to-b from-blue-700 via-blue-500 to-blue-300'
+      // Deep navy to blue for night
+      : 'bg-gradient-to-b from-gray-900 via-blue-900 to-blue-700';
   } else if (lowercaseCondition.includes('clouds')) {
-    return isDay 
-      ? 'bg-gradient-to-b from-day-cloudy to-blue-200' 
-      : 'bg-gradient-to-b from-night-cloudy to-blue-800';
+    return isDay
+      // Muted blue-gray for clouds, but not too light
+      ? 'bg-gradient-to-b from-gray-400 via-gray-500 to-blue-700'
+      // Night: deeper grays
+      : 'bg-gradient-to-b from-gray-800 via-gray-700 to-blue-900';
   } else {
-    return isDay 
-      ? 'bg-gradient-to-b from-day-cloudy to-blue-200' 
-      : 'bg-gradient-to-b from-night-cloudy to-blue-800';
+    // Default: neutral but readable
+    return isDay
+      ? 'bg-gradient-to-b from-gray-300 via-blue-400 to-blue-700'
+      : 'bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900';
   }
 };

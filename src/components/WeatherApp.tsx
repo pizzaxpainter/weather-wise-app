@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SearchBar from './SearchBar';
 import CurrentWeather from './CurrentWeather';
@@ -22,13 +21,15 @@ const WeatherApp: React.FC = () => {
     fetchWeatherData();
   }, []);
 
-  const fetchWeatherData = async () => {
-    if (!city) return;
+  // Modified to accept a city parameter
+  const fetchWeatherData = async (targetCity?: string) => {
+    const cityToUse = targetCity || city;
+    if (!cityToUse) return;
 
     setLoading(true);
     try {
-      const weather = await getCurrentWeather(city);
-      const forecast = await getForecast(city);
+      const weather = await getCurrentWeather(cityToUse);
+      const forecast = await getForecast(cityToUse);
       
       if (weather) {
         setWeatherData(weather);
@@ -59,7 +60,8 @@ const WeatherApp: React.FC = () => {
 
   const handleSearch = (searchCity: string) => {
     setCity(searchCity);
-    fetchWeatherData();
+    // Pass the city directly to avoid state delay
+    fetchWeatherData(searchCity);
   };
 
   const detectUserLocation = () => {
@@ -96,7 +98,8 @@ const WeatherApp: React.FC = () => {
           
           if (detectedCity) {
             setCity(detectedCity);
-            await fetchWeatherData();
+            // Pass the detected city directly to avoid state delay
+            await fetchWeatherData(detectedCity);
             toast({
               title: "Location detected",
               description: `Weather for ${detectedCity}`,

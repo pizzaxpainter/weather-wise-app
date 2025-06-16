@@ -18,14 +18,12 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data }) => {
 
   if (!data) return null;
 
-  // No dt, sunrise, sunset available, so skip time and day/night logic
-  // Use the first weather description for icon
-  const WeatherIcon = getWeatherIcon(data.weather[0].description, true); // Assume daytime or ignore
+  const WeatherIcon = getWeatherIcon(data.weather[0].description, true);
 
   const outfitRecommendation = getOutfitRecommendation(
     data.main.temp,
     data.weather[0].main,
-    true // Assume daytime or ignore
+    true
   );
 
   const handleShowOutfit = () => {
@@ -54,7 +52,6 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data }) => {
               <h2 className="text-3xl font-bold flex items-center">
                 {data.name}, {data.sys.country}
               </h2>
-              {/* No date/time display since dt is missing */}
               <div className="flex items-center mt-4">
                 <WeatherIcon className="w-12 h-12 mr-2" />
                 <div>
@@ -67,20 +64,52 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data }) => {
               <p className="text-6xl font-bold">
                 {formatTemperature(data.main.temp)}
               </p>
-              <p className="text-xl">
+              <p className="text-xl mb-4">
                 Feels like {formatTemperature(data.main.feels_like)}
               </p>
-              <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                <Button
-                  onClick={handleShowOutfit}
-                  className="bg-white/20 hover:bg-white/30"
-                  disabled={showOutfitRecommendation}
-                >
-                  <ShirtIcon className="w-4 h-4 mr-2" />
-                  What to Wear
-                </Button>
+
+              {/* Transparent, shiny/shimmery button */}
+              <div className="flex justify-center md:justify-end">
+              <Button
+                onClick={handleShowOutfit}
+                disabled={showOutfitRecommendation}
+                className="
+                  relative group
+                  border border-white/60
+                  bg-transparent
+                  text-white
+                  font-semibold
+                  px-8 py-4
+                  rounded-xl
+                  overflow-hidden
+                  transition-transform duration-300
+                  hover:scale-105
+                  focus:outline-none focus:ring-2 focus:ring-white/70
+                  shadow-md
+                "
+              >
+                <div className="flex items-center gap-3 relative z-10">
+                  <ShirtIcon className="w-6 h-6" />
+                  <span className="text-shadow">What to Wear</span>
+                </div>
+                {/* Shimmer effect */}
+                <span
+                  className="
+                    absolute top-0 left-[-75%] h-full w-1/3
+                    bg-gradient-to-r from-transparent via-white/60 to-transparent
+                    opacity-0 group-hover:opacity-100
+                    group-hover:left-[120%]
+                    transition-all duration-700 delay-200
+                    rotate-12
+                    pointer-events-none
+                    z-0
+                  "
+                />
+              </Button>
+
               </div>
             </div>
+            
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
@@ -112,6 +141,26 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data }) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Add this global style once in your app (e.g., index.css) */}
+      <style>
+        {`
+          .text-shadow {
+            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+          }
+          @keyframes shimmer {
+            0% {
+              transform: translateX(-100%);
+            }
+            100% {
+              transform: translateX(100%);
+            }
+          }
+          .animate-shimmer {
+            animation: shimmer 2.5s infinite;
+          }
+        `}
+      </style>
     </>
   );
 };
